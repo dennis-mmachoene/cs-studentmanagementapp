@@ -50,5 +50,86 @@ namespace StudentManagementApp.Controllers
             var students = await appDbContext.Students.ToListAsync();
             return View("View", students);
         }
+
+        //GET: /Student/EditSearch
+        [HttpGet]
+        public IActionResult EditSearch()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditSearch(string StudentNumber)
+        {
+            if (string.IsNullOrEmpty(StudentNumber))
+            {
+                ModelState.AddModelError("", "Please provide a student number");
+                return View();
+            }
+
+            var student = await appDbContext.Students.FirstOrDefaultAsync(x =>
+                x.StudentNumber == StudentNumber
+            );
+            if (student == null)
+            {
+                ModelState.AddModelError("", "Student not found");
+                return View();
+            }
+
+            return RedirectToAction("Edit", new { studentNumber = student.StudentNumber });
+        }
+
+        //GET: /Student/Edit/{studentNumber}
+        [HttpGet]
+        public async Task<IActionResult> Edit(string studentNumber)
+        {
+            var student = await appDbContext.Students.FirstOrDefaultAsync(x =>
+                x.StudentNumber == studentNumber
+            );
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            var studentViewModel = new StudentViewModel
+            {
+                StudentNumber = student.StudentNumber,
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                EmailAddress = student.EmailAddress,
+                DateOfBirth = student.DateOfBirth
+            };
+
+            return View(studentViewModel);
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(StudentViewModel studentViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(studentViewModel);
+            }
+
+            var student = await appDbContext.Students.FirstOrDefaultAsync(x => x.StudentNumber == studentViewModel.StudentNumber);
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            student.FirstName = studentViewModel.FirstName;
+            student.LastName = studentViewModel.LastName;
+            student.EmailAddress = studentViewModel.EmailAddress;
+            student.DateOfBirth = studentViewModel.DateOfBirth;
+
+            await appDbContext.SaveChangesAsync();
+
+            return RedirectToAction("ViewStudents");
+        }
     }
 }

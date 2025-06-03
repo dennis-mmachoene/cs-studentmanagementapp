@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Search Student to Edit";
+}
+
+<h2>Student Search</h2>
+
+<form asp-action="EditSearch" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        <label for="studentNumber">Student Number</label>
+        <input type="text" name="studentNumber" class="form-control" />
+
+        <button type="submit" class="btn btn-primary mt-2">Search</button>
+
+        <div class="text-danger">
+            @Html.ValidationSummary()
+        </div>
+
+    </div>
+</form>
