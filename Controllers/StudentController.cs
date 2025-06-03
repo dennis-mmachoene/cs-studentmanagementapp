@@ -99,11 +99,10 @@ namespace StudentManagementApp.Controllers
                 FirstName = student.FirstName,
                 LastName = student.LastName,
                 EmailAddress = student.EmailAddress,
-                DateOfBirth = student.DateOfBirth
+                DateOfBirth = student.DateOfBirth,
             };
 
             return View(studentViewModel);
-
         }
 
         [HttpPost]
@@ -115,7 +114,9 @@ namespace StudentManagementApp.Controllers
                 return View(studentViewModel);
             }
 
-            var student = await appDbContext.Students.FirstOrDefaultAsync(x => x.StudentNumber == studentViewModel.StudentNumber);
+            var student = await appDbContext.Students.FirstOrDefaultAsync(x =>
+                x.StudentNumber == studentViewModel.StudentNumber
+            );
 
             if (student == null)
             {
@@ -129,6 +130,64 @@ namespace StudentManagementApp.Controllers
 
             await appDbContext.SaveChangesAsync();
 
+            return RedirectToAction("ViewStudents");
+        }
+
+        //GET: /Student/DeleteSearch
+        [HttpGet]
+        public IActionResult DeleteSearch()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSearch(string studentNumber)
+        {
+            if (string.IsNullOrEmpty(studentNumber))
+            {
+                ModelState.AddModelError("", "Please provide a student number");
+                return View();
+            }
+
+            var student = await appDbContext.Students.FirstOrDefaultAsync(x =>
+                x.StudentNumber == studentNumber
+            );
+            if (student == null)
+            {
+                ModelState.AddModelError("", "Student is not found");
+            }
+
+            return RedirectToAction("Delete", new { studentNumber = student.StudentNumber });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(string studentNumber)
+        {
+            var student = await appDbContext.Students.FirstOrDefaultAsync(x =>
+                x.StudentNumber == studentNumber
+            );
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return View(student);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmDelete(string studentNumber)
+        {
+            var student = await appDbContext.Students.FirstOrDefaultAsync(x => x.StudentNumber == studentNumber);
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            appDbContext.Students.Remove(student);
+            await appDbContext.SaveChangesAsync();
             return RedirectToAction("ViewStudents");
         }
     }

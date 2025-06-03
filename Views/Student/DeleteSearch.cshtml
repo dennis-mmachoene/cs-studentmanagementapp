@@ -1,10 +1,10 @@
 @{
-    ViewData["Title"] = "Search Student to Edit";
+    ViewData["Title"] = "Search Student to Remove";
 }
 
-<h2>Student Search</h2>
+<h2>Remove Student - Search</h2>
 
-<form asp-action="EditSearch" method="post">
+<form asp-action="DeleteSearch" method="post">
     @Html.AntiForgeryToken()
 
     <div class="form-group">
@@ -15,6 +15,5 @@
     </div>
     <div class="text-danger">
         @Html.ValidationSummary()
-
     </div>
 </form>

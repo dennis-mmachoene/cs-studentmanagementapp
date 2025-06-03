@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using StudentManagementApp.Data;
+using StudentManagementApp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,4 +30,9 @@ app.MapStaticAssets();
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+using (var scope = app.Services.CreateAsyncScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.EnsureCreated();
+}
 app.Run();
