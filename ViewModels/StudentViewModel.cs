@@ -4,7 +4,7 @@ namespace StudentManagementApp.ViewModels
 {
     public class StudentViewModel
     {
-         [Required]
+        [Required]
         public string StudentNumber { get; set; }
 
         [Required]

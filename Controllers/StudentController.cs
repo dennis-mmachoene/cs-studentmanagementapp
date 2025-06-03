@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StudentManagementApp.Data;
 using StudentManagementApp.Models;
 using StudentManagementApp.ViewModels;
@@ -41,6 +42,13 @@ namespace StudentManagementApp.Controllers
             await appDbContext.SaveChangesAsync();
 
             return RedirectToAction("Index", "Home");
+        }
+
+        //GET: /Student/View
+        public async Task<IActionResult> ViewStudents()
+        {
+            var students = await appDbContext.Students.ToListAsync();
+            return View("View", students);
         }
     }
 }

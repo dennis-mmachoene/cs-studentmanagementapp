@@ -1,0 +1,39 @@
+@model List<StudentManagementApp.Models.Student>
+
+@{
+    ViewData["Title"] = "View Students";
+}
+
+<h2>View Student</h2>
+
+<table id="studentsTable" class="display table table-bordered">
+    <thead>
+        <th>Student Number</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email Address</th>
+        <th>Date of Birth</th>
+    </thead>
+    <tbody>
+        @foreach (var student in Model){
+            <tr>
+                <th>@student.StudentNumber</th>
+                <th>@student.FirstName</th>
+                <th>@student.LastName</th>
+                <th>@student.EmailAddress</th>
+                <th>@student.DateOfBirth</th>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+    <script>
+        $(document).ready(function() {
+            $('#studentsTable').DataTable();
+        })
+    </script>
+}
