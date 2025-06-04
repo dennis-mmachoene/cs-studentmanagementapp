@@ -1,3 +1,4 @@
+using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentManagementApp.Data;
@@ -45,10 +46,94 @@ namespace StudentManagementApp.Controllers
         }
 
         //GET: /Student/View
-        public async Task<IActionResult> ViewStudents()
+        // public async Task<IActionResult> ViewStudents()
+        // {
+        //     var students = await appDbContext.Students.ToListAsync();
+        //     return View("View", students);
+        // }
+
+        public IActionResult ViewStudents()
         {
-            var students = await appDbContext.Students.ToListAsync();
-            return View("View", students);
+            return View("View");
+        }
+
+        [HttpPost]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> GetStudents([FromBody] DataTableRequest request)
+        {
+            try
+            {
+                var query = appDbContext.Students.AsQueryable();
+
+                var totalRecords = await query.CountAsync();
+
+                if (!string.IsNullOrEmpty(request.Search.Value))
+                {
+                    string searchValue = request.Search.Value.ToLower();
+                    query = query.Where(s =>
+                        s.StudentNumber.Contains(searchValue)
+                        || s.FirstName.Contains(searchValue)
+                        || s.LastName.Contains(searchValue)
+                        || s.EmailAddress.Contains(searchValue)
+                    );
+                }
+
+                var filteredRecords = await query.CountAsync();
+
+                if (request.Order.Any())
+                {
+                    var order = request.Order.First();
+                    var columnName = request.Columns[order.Column].Data;
+                    var sortDirection = order.Dir == "asc" ? "ascending" : "descending";
+
+                    query = columnName switch
+                    {
+                        "firstName" => order.Dir == "asc"
+                            ? query.OrderBy(s => s.FirstName)
+                            : query.OrderByDescending(s => s.FirstName),
+                        "lastName" => order.Dir == "asc"
+                            ? query.OrderBy(s => s.LastName)
+                            : query.OrderByDescending(s => s.LastName),
+                        "emailAddress" => order.Dir == "asc"
+                            ? query.OrderBy(s => s.EmailAddress)
+                            : query.OrderByDescending(s => s.EmailAddress),
+                        "dateOfBirth" => order.Dir == "asc"
+                            ? query.OrderBy(s => s.DateOfBirth)
+                            : query.OrderByDescending(s => s.DateOfBirth),
+                        _ => query.OrderBy(s => s.StudentNumber),
+                    };
+                }
+                else
+                {
+                    query = query.OrderBy(s => s.StudentNumber);
+                }
+
+                var students = await query
+                    .Skip(request.Start)
+                    .Take(request.Length)
+                    .Select(s => new StudentViewModel
+                    {
+                        StudentNumber = s.StudentNumber,
+                        FirstName = s.FirstName,
+                        LastName = s.LastName,
+                        EmailAddress = s.EmailAddress,
+                        DateOfBirth = s.DateOfBirth,
+                    })
+                    .ToListAsync();
+
+                var response = new DataTableResponse<StudentViewModel>
+                {
+                    Draw = request.Draw,
+                    RecordsFiltered = filteredRecords,
+                    RecordsTotal = totalRecords,
+                    Data = students,
+                };
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
         }
 
         //GET: /Student/EditSearch
@@ -180,7 +265,9 @@ namespace StudentManagementApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmDelete(string studentNumber)
         {
-            var student = await appDbContext.Students.FirstOrDefaultAsync(x => x.StudentNumber == studentNumber);
+            var student = await appDbContext.Students.FirstOrDefaultAsync(x =>
+                x.StudentNumber == studentNumber
+            );
             if (student == null)
             {
                 return NotFound();
