@@ -1,8 +1,15 @@
 @{
     ViewData["Title"] = "View Students";
 }
+<div class="d-flex justify-content-between align-items-center mb-3">
 
-<h2>View Student</h2>
+
+    <h2>View Student</h2>
+
+    <div class="">
+        <a href="@Url.Action("ExportToExcel", "Student")" id="exportToExcel" class="btn btn-success me-2"><i class="fas fa-file-excel"></i> Export to Excel</a>
+    </div>
+</div>
 
 <table id="studentsTable" class="display table table-bordered">
     <thead>
@@ -22,7 +29,9 @@
 @section Scripts {
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script>
         $(document).ready(function () {
             $('#studentsTable').DataTable({
@@ -64,6 +73,19 @@
                 },
                 "responsive": true
             });
+
+            $('#exportToExcel').click(function (e) {
+                var $btn = $(this);
+                var originalText = $btn.html();
+
+                $btn.html('<i class="fas fa-spinner fa-spin"></i> Exporting...');
+                $btn.prop('disabled', true);
+
+                setTimeout(() => {
+                    $btn.html(originalText);
+                    $btn.prop('disabled', false);
+                }, 3000)
+            })
         })
     </script>
 }
