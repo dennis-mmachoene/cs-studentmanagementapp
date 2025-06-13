@@ -5,8 +5,14 @@
 <h1>Student Management</h1>
 
 <ul>
-    <li><a asp-controller="Student" asp-action="Add">Add Student</a></li>
-    <li><a asp-controller="student" asp-action="EditSearch">Edit Student</a></li>
-    <li><a asp-controller="Student" asp-action="ViewStudents">View Students</a></li>
-    <li><a asp-action="DeleteSearch" asp-controller="Student">Remove Student</a></li>
+    <li><i class="fa-solid fa-user-plus"></i> <a asp-controller="Student" asp-action="Add">Add Student</a></li>
+    <li><i class="fa-solid fa-user-pen"></i> <a asp-controller="student" asp-action="EditSearch">Edit Student</a></li>
+    <li><i class="fa-solid fa-eye"></i> <a asp-controller="Student" asp-action="ViewStudents">View Students</a></li>
+    <li><i class="fa-solid fa-user-minus"></i> <a asp-action="DeleteSearch" asp-controller="Student">Remove Student</a></li>
 </ul>
+
+@section Scripts{
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+}

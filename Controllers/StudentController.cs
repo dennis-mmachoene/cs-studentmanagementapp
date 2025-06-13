@@ -1,5 +1,7 @@
 using System.Linq.Dynamic.Core;
 using ClosedXML.Excel;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentManagementApp.Data;
@@ -341,6 +343,78 @@ namespace StudentManagementApp.Controllers
                 TempData["Error"] = $"Error exporting to excel: {ex.Message}";
                 return RedirectToAction("View");
             }
+        }
+
+        public async Task<IActionResult> ExportToPdf()
+        {
+            var students = await appDbContext
+                .Students.OrderBy(e => e.StudentNumber)
+                .Select(s => new
+                {
+                    StudentNumber = s.StudentNumber,
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    EmailAddress = s.EmailAddress,
+                    DateOfBirth = s.DateOfBirth.ToString("yyyy-MM-dd"),
+                })
+                .ToListAsync();
+
+            using var stream = new MemoryStream();
+            var document = new Document(PageSize.A4.Rotate(), 10, 10, 10, 10);
+            PdfWriter.GetInstance(document, stream);
+
+            document.Open();
+
+            var title = new Paragraph(
+                "Students",
+                FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16)
+            );
+            title.Alignment = Element.ALIGN_CENTER;
+            title.SpacingAfter = 20;
+            document.Add(title);
+
+            var table = new PdfPTable(6);
+            table.WidthPercentage = 100;
+            table.SetWidths(new float[] { 0.5f, 1, 2, 2, 2, 1 });
+
+            var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
+            var headers = new[]
+            {
+                "",
+                "Student Number",
+                "First Name",
+                "Last Name",
+                "Email Address",
+                "Date of Birth",
+            };
+
+            foreach (var header in headers)
+            {
+                var cell = new PdfPCell(new Phrase(header, headerFont));
+                cell.BackgroundColor = BaseColor.LIGHT_GRAY;
+                cell.HorizontalAlignment = Element.ALIGN_CENTER;
+                table.AddCell(cell);
+            }
+
+            var dataFont = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+            var count = 0;
+            foreach (var student in students)
+            {
+                count++;
+                table.AddCell(new Phrase(count + ". ", dataFont));
+                table.AddCell(new Phrase(student.StudentNumber, dataFont));
+                table.AddCell(new Phrase(student.FirstName, dataFont));
+                table.AddCell(new Phrase(student.LastName, dataFont));
+                table.AddCell(new Phrase(student.EmailAddress, dataFont));
+                table.AddCell(new Phrase(student.DateOfBirth, dataFont));
+            }
+
+            document.Add(table);
+            document.Close();
+
+            var pdfBytes = stream.ToArray();
+
+            return File(pdfBytes, "application/pdf", $"Students_{DateTime.Now:yyyyMMdd}.pdf");
         }
     }
 }

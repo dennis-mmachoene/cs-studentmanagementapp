@@ -7,7 +7,11 @@
     <h2>View Student</h2>
 
     <div class="">
-        <a href="@Url.Action("ExportToExcel", "Student")" id="exportToExcel" class="btn btn-success me-2"><i class="fas fa-file-excel"></i> Export to Excel</a>
+        <a href="@Url.Action("ExportToExcel", "Student")" id="exportToExcel" class="btn btn-success me-2"><i
+                class="fas fa-file-excel"></i> Export to Excel</a>
+                <a href="@Url.Action("ExportToPdf", "Student")" id="exportToPdf" class="btn btn-danger me-2">
+                    <i class="fa-solid fa-file-pdf"></i> Get PDF
+                </a>
     </div>
 </div>
 
@@ -62,7 +66,7 @@
                 ],
                 "order": [[0, "asc"]],
                 "pageLength": 10,
-                "lengthMenu": [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+                "lengthMenu": [[ 5, 10, 25, 50, 100], [ 5, 10, 25, 50, 100]],
                 "language": {
                     "processing": '<div class="loading"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Loading employees...</p></div>',
                     "emptyTable": "No employees found",
@@ -74,7 +78,7 @@
                 "responsive": true
             });
 
-            $('#exportToExcel').click(function (e) {
+            @* $('#exportToExcel').click(function (e) {
                 var $btn = $(this);
                 var originalText = $btn.html();
 
@@ -85,7 +89,7 @@
                     $btn.html(originalText);
                     $btn.prop('disabled', false);
                 }, 3000)
-            })
+            }) *@
         })
     </script>
 }
