@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StudentManagementApp.Data;
 using StudentManagementApp.Models;
+using StudentManagementApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+builder.Services.AddScoped<IExportService, ExportSerive>();
 
 
 var app = builder.Build();
