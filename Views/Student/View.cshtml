@@ -1,32 +1,42 @@
 @{
     ViewData["Title"] = "View Students";
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
 
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-users text-primary me-2"></i>
+            View Students
+        </h2>
 
-    <h2>View Student</h2>
+        <div class="btn-group" role="group">
+            <a href="@Url.Action("ExportToExcel", "Student")" id="exportToExcel" class="btn btn-success">
+                <i class="fas fa-file-excel me-1"></i> Export Excel
+            </a>
+            <a href="@Url.Action("ExportToPdf", "Student")" id="exportToPdf" class="btn btn-danger">
+                <i class="fa-solid fa-file-pdf me-1"></i> Export PDF
+            </a>
+        </div>
+    </div>
 
-    <div class="">
-        <a href="@Url.Action("ExportToExcel", "Student")" id="exportToExcel" class="btn btn-success me-2"><i
-                class="fas fa-file-excel"></i> Export to Excel</a>
-                <a href="@Url.Action("ExportToPdf", "Student")" id="exportToPdf" class="btn btn-danger me-2">
-                    <i class="fa-solid fa-file-pdf"></i> Get PDF
-                </a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table id="studentsTable" class="display table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Student Number</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email Address</th>
+                        <th>Date of Birth</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
-<table id="studentsTable" class="display table table-bordered">
-    <thead>
-        <th>Student Number</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Email Address</th>
-        <th>Date of Birth</th>
-    </thead>
-    <tbody>
-
-    </tbody>
-</table>
 
 @Html.AntiForgeryToken()
 
@@ -62,34 +72,49 @@
                     { "data": "firstName", "name": "firstName", "orderable": true },
                     { "data": "lastName", "name": "lastName", "orderable": true },
                     { "data": "emailAddress", "name": "emailAddress", "orderable": true },
-                    { "data": "dateOfBirth", "name": "dateOfBirth", "orderable": true },
+                    { 
+                        "data": "dateOfBirth", 
+                        "name": "dateOfBirth", 
+                        "orderable": true,
+                        "render": function(data) {
+                            return data ? new Date(data).toLocaleDateString() : '';
+                        }
+                    }
                 ],
                 "order": [[0, "asc"]],
                 "pageLength": 10,
-                "lengthMenu": [[ 5, 10, 25, 50, 100], [ 5, 10, 25, 50, 100]],
+                "lengthMenu": [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
                 "language": {
-                    "processing": '<div class="loading"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Loading employees...</p></div>',
-                    "emptyTable": "No employees found",
-                    "zeroRecords": "No matching employees found",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ employees",
-                    "infoEmpty": "Showing 0 to 0 of 0 employees",
-                    "infoFiltered": "(filtered from _MAX_ total employees)"
+                    "processing": '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 mb-0">Loading students...</p></div>',
+                    "emptyTable": "No students found",
+                    "zeroRecords": "No matching students found",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ students",
+                    "infoEmpty": "Showing 0 to 0 of 0 students",
+                    "infoFiltered": "(filtered from _MAX_ total students)",
+                    "search": "Search students:"
                 },
-                "responsive": true
+                "responsive": true,
+                "dom": '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                       '<"row"<"col-sm-12"tr>>' +
+                       '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
             });
 
-            @* $('#exportToExcel').click(function (e) {
+            // Export button loading states
+            $('#exportToExcel, #exportToPdf').click(function (e) {
                 var $btn = $(this);
                 var originalText = $btn.html();
+                var isExcel = $btn.attr('id') === 'exportToExcel';
+                var loadingIcon = isExcel ? 'fas fa-spinner fa-spin' : 'fas fa-spinner fa-spin';
+                var loadingText = isExcel ? 'Exporting...' : 'Generating...';
 
-                $btn.html('<i class="fas fa-spinner fa-spin"></i> Exporting...');
+                $btn.html('<i class="' + loadingIcon + ' me-1"></i>' + loadingText);
                 $btn.prop('disabled', true);
 
                 setTimeout(() => {
                     $btn.html(originalText);
                     $btn.prop('disabled', false);
-                }, 3000)
-            }) *@
-        })
+                }, 3000);
+            });
+        });
     </script>
 }
